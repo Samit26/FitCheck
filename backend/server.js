@@ -73,7 +73,7 @@ app.get("*", (req, res) => {
       message: "Endpoint not found",
     });
   }
-  
+
   // Serve index.html for all other routes (SPA fallback)
   const indexPath = path.join(distPath, "index.html");
   res.sendFile(indexPath, (err) => {
