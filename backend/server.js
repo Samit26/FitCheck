@@ -27,6 +27,10 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Serve static files from the dist folder (production build)
+const distPath = path.join(__dirname, "..", "dist");
+app.use(express.static(distPath));
+
 // API Routes
 app.use("/api", clothingRoutes);
 
@@ -59,11 +63,26 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Endpoint not found",
+// SPA fallback - serve index.html for all non-API routes
+// This ensures the app works on page refresh
+app.get("*", (req, res) => {
+  // Don't handle API routes here
+  if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+    return res.status(404).json({
+      success: false,
+      message: "Endpoint not found",
+    });
+  }
+  
+  // Serve index.html for all other routes (SPA fallback)
+  const indexPath = path.join(distPath, "index.html");
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(404).json({
+        success: false,
+        message: "Application not found. Please build the frontend first.",
+      });
+    }
   });
 });
 

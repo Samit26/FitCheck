@@ -1,0 +1,5 @@
+# Netlify redirects for SPA
+# Redirect all routes to index.html except API and uploads
+/api/*  /api/:splat  200
+/uploads/*  /uploads/:splat  200
+/*  /index.html  200
